@@ -1,0 +1,729 @@
+<!doctype html>
+<html>
+
+<head>
+    <link href="./src/styles/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.6/dist/basecoat.cdn.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.6/dist/js/basecoat.min.js" defer></script>
+    <!-- Only needed once to register and initialize components -->
+    <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.6/dist/js/dropdown-menu.min.js" defer></script>
+
+    <!-- Add Tailwind CSS before your theme script -->
+    <script>
+        (() => {
+            try {
+                const stored = localStorage.getItem('themeMode');
+                if (stored ? stored === 'dark'
+                    : matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (_) { }
+
+            const apply = dark => {
+                document.documentElement.classList.toggle('dark', dark);
+                try { localStorage.setItem('themeMode', dark ? 'dark' : 'light'); } catch (_) { }
+            };
+
+            document.addEventListener('basecoat:theme', (event) => {
+                const mode = event.detail?.mode;
+                apply(mode === 'dark' ? true
+                    : mode === 'light' ? false
+                        : !document.documentElement.classList.contains('dark'));
+            });
+        })();
+    </script>
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<link href="/src/style.css" rel="stylesheet">-->
+
+</head>
+
+<body class="vsc-initialized">
+    <main id="content">
+        <header class="bg-background sticky inset-x-0 top-0 isolate flex shrink-0 items-center gap-2 border-b z-10">
+            <div class="flex h-14 w-full items-center gap-2 px-4">
+                <button type="button" onclick="document.dispatchEvent(new CustomEvent('basecoat:sidebar'))"
+                    aria-label="Toggle sidebar" data-tooltip="Toggle sidebar" data-side="bottom" data-align="start"
+                    class="btn-sm-icon-ghost mr-auto size-7 -ml-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke="">
+                        <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                        <path d="M9 3v18"></path>
+                    </svg>
+                </button>
+                <select class="select h-8 leading-none" id="theme-select">
+                    <option value="">Default</option>
+                    <option value="claude">Claude</option>
+                    <option value="doom-64">Doom 64</option>
+                    <option value="supabase">Supabase</option>
+                </select>
+                <script>
+                    (() => {
+                        const themeSelect = document.getElementById('theme-select');
+                        const storedTheme = localStorage.getItem('themeVariant');
+                        if (themeSelect && storedTheme) themeSelect.value = storedTheme;
+                        themeSelect.addEventListener('change', () => {
+                            const newTheme = themeSelect.value;
+                            document.documentElement.classList.forEach(c => {
+                                if (c.startsWith('theme-')) document.documentElement.classList.remove(c);
+                            });
+                            if (newTheme) {
+                                document.documentElement.classList.add(`theme-${newTheme}`);
+                                localStorage.setItem('themeVariant', newTheme);
+                            } else {
+                                localStorage.removeItem('themeVariant');
+                            }
+                        });
+                    })();
+                </script>
+
+                <button type="button" aria-label="Toggle dark mode" data-tooltip="Toggle dark mode" data-side="bottom"
+                    onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))" class="btn-icon-outline size-8">
+                    <span class="hidden dark:block"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke="">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m6.34 17.66-1.41 1.41"></path>
+                            <path d="m19.07 4.93-1.41 1.41"></path>
+                        </svg></span>
+                    <span class="block dark:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke="">
+                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                        </svg></span>
+                </button>
+                <a href="https://github.com/hunvreus/basecoat" class="btn-icon size-8" target="_blank"
+                    rel="noopener noreferrer" data-tooltip="GitHub repository" data-side="bottom" data-align="end">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke="">
+                        <path
+                            d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4">
+                        </path>
+                        <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                    </svg>
+                </a>
+            </div>
+        </header>
+
+        <div class="mx-auto md:max-w-3xl">
+            <!-- Logo section -->
+            <div
+                class="aspect-2/1 border-x border-edge select-none sm:aspect-3/1 flex items-center justify-center text-black dark:text-white screen-line-before screen-line-after before:-top-px after:-bottom-px bg-black/0.75 bg-[radial-gradient(var(--pattern-foreground)_1px,transparent_0)] bg-size-[10px_10px] bg-center [--pattern-foreground:var(--color-zinc-950)]/5 dark:bg-white/0.75 dark:[--pattern-foreground:var(--color-white)]/5 relative">
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <svg width="80" height="80" viewBox="0 0 80 80" class="block">
+                        <rect x="12" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="12" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="12" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="24" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="48" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="60" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="60" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="12" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="12" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="24" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="24" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="48" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="48" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="60" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="60" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="0" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="12" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="12" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="24" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="24" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="36" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="48" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="48" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="60" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="72" y="60" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="0" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="12" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="24" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="36" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="48" y="72" width="12" height="12" fill="currentColor"></rect>
+                        <rect x="60" y="72" width="12" height="12" fill="currentColor"></rect>
+                    </svg>
+                    <span class="mt-4 text-xs text-zinc-400 dark:text-zinc-600">hover ? Wordmark : Brandmark<!-- -->
+                    </span>
+                </div>
+            </div>
+            <!-- Profile pic section -->
+            <div class="screen-line-after flex border-x border-edge">
+                <div class="shrink-0 border-r border-edge">
+                    <div class="mx-0.5 my-[3px]"><img alt="Sourabh Soni's avatar" width="160" height="160"
+                            decoding="async" data-nimg="1"
+                            class="size-32 rounded-full ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40"
+                            style="color:transparent" src="img/ppGhibliP.png">
+                    </div>
+                </div>
+                <div class="flex flex-1 flex-col">
+                    <div
+                        class="flex grow items-start justify-end pr-4 pb-1 pl-4 bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] [--pattern-foreground:var(--color-edge)]/56">
+                        <div class="py-2 font-mono text-xs text-zinc-400 dark:text-zinc-600">
+                            <div class="flex items-center gap-2">
+                                <div class="h-2 w-2 rounded-full bg-green-500"></div>
+                                <!-- -->: Pune, MH, India
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-edge">
+                        <h1 class="flex items-center pl-4 text-3xl font-semibold">Rohit Kumar<!-- -->&nbsp;<svg
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                class="size-[0.6em] translate-y-px text-info select-none" data-state="closed"
+                                data-slot="tooltip-trigger">
+                                <path fill="#1DA1F2"
+                                    d="M24 12a4.454 4.454 0 0 0-2.564-3.91 4.437 4.437 0 0 0-.948-4.578 4.436 4.436 0 0 0-4.577-.948A4.44 4.44 0 0 0 12 0a4.423 4.423 0 0 0-3.9 2.564 4.434 4.434 0 0 0-2.43-.178 4.425 4.425 0 0 0-2.158 1.126 4.42 4.42 0 0 0-1.12 2.156 4.42 4.42 0 0 0 .183 2.421A4.456 4.456 0 0 0 0 12a4.465 4.465 0 0 0 2.576 3.91 4.433 4.433 0 0 0 .936 4.577 4.459 4.459 0 0 0 4.577.95A4.454 4.454 0 0 0 12 24a4.439 4.439 0 0 0 3.91-2.563 4.26 4.26 0 0 0 5.526-5.526A4.453 4.453 0 0 0 24 12Zm-13.709 4.917-4.38-4.378 1.652-1.663 2.646 2.646L15.83 7.4l1.72 1.591-7.258 7.926Z">
+                                </path>
+                                <img class="ml-1" alt="JavaScript icon" loading="lazy" width="32" height="32"
+                                    decoding="async" data-nimg="1" style="color:transparent" src="icons/indianFlag.svg">
+
+                            </svg></h1>
+                        <div class="border-t border-edge py-2 pl-4">
+                            <p class="text-sm text-muted-foreground">Software Engineer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section data-slot="panel" class="screen-line-before screen-line-after border-x border-edge" id="about">
+                <div data-slot="panel-header" class="screen-line-after px-4">
+                    <h2 data-slot="panel-title" class="text-3xl font-semibold">About</h2>
+                </div>
+                <div data-slot="panel-body" class="p-4">
+                    <div data-slot="prose"
+                        class="prose prose-sm max-w-none font-mono text-foreground prose-zinc dark:prose-invert prose-headings:font-sans prose-headings:font-semibold prose-headings:text-balance prose-h2:border-b prose-h2:border-edge prose-h2:pb-2 prose-h2:text-2xl prose-lead:text-base prose-a:font-medium prose-a:break-words prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 prose-code:rounded-md prose-code:border prose-code:bg-muted/50 prose-code:px-[0.3rem] prose-code:py-[0.2rem] prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none prose-hr:border-edge">
+                        Full-stack engineer. Creator of tool that simplifies chatting with websites and enhances
+                        productivity.</div>
+                </div>
+            </section>
+            <!-- Horizontal Line-->
+            <div data-orientation="horizontal" role="none" data-slot="separator"
+                class="shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px">
+            </div>
+            <!--Details-->
+
+            <div data-slot="panel-body" class="creen-line-before screen-line-after border-x border-edge p-4 space-y-2">
+                <div class="flex items-center gap-4 font-mono text-sm">
+                    <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted dark:inset-shadow-[1px_1px_1px,0px_0px_2px] dark:inset-shadow-white/15"
+                        aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-code-xml pointer-events-none size-4 text-muted-foreground"
+                            aria-hidden="true">
+                            <path d="m18 16 4-4-4-4"></path>
+                            <path d="m6 8-4 4 4 4"></path>
+                            <path d="m14.5 4-5 16"></path>
+                        </svg></div>
+                    <p class="text-balance">Gen AI Engineer<!-- --> @<a
+                            class="ml-0.5 font-medium underline-offset-4 hover:underline"
+                            href="https://learn.datamonk.dev/?utm_source=srb.codes&amp;utm_medium=portfolio_website&amp;utm_campaign=referral"
+                            target="_blank" rel="noopener">Datamonk</a></p>
+                </div>
+                <div class="flex items-center gap-4 font-mono text-sm">
+                    <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted dark:inset-shadow-[1px_1px_1px,0px_0px_2px] dark:inset-shadow-white/15"
+                        aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-phone pointer-events-none size-4 text-muted-foreground"
+                            aria-hidden="true">
+                            <path
+                                d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
+                            </path>
+                        </svg></div>
+                    <p class="text-balance"><a class="underline-offset-4 hover:underline" href="tel:+918107655737"
+                            target="_blank" rel="noopener noreferrer">+918107655737</a></p>
+                </div>
+                <div class="flex items-center gap-4 font-mono text-sm">
+                    <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted dark:inset-shadow-[1px_1px_1px,0px_0px_2px] dark:inset-shadow-white/15"
+                        aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-mail pointer-events-none size-4 text-muted-foreground"
+                            aria-hidden="true">
+                            <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path>
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                        </svg></div>
+                    <p class="text-balance"><a class="underline-offset-4 hover:underline"
+                            href="mailto:sourabhs701@gmail.com" target="_blank"
+                            rel="noopener noreferrer">sourabhs701@gmail.com</a></p>
+                </div>
+                <div class="flex items-center gap-4 font-mono text-sm">
+                    <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted dark:inset-shadow-[1px_1px_1px,0px_0px_2px] dark:inset-shadow-white/15"
+                        aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-globe pointer-events-none size-4 text-muted-foreground"
+                            aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                            <path d="M2 12h20"></path>
+                        </svg></div>
+                    <p class="text-balance"><a class="underline-offset-4 hover:underline" href="https://srb.codes"
+                            target="_blank" rel="noopener noreferrer">srb.codes</a></p>
+                </div>
+                <div class="flex items-center gap-4 font-mono text-sm">
+                    <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted dark:inset-shadow-[1px_1px_1px,0px_0px_2px] dark:inset-shadow-white/15"
+                        aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-mars pointer-events-none size-4 text-muted-foreground"
+                            aria-hidden="true">
+                            <path d="M16 3h5v5"></path>
+                            <path d="m21 3-6.75 6.75"></path>
+                            <circle cx="10" cy="14" r="6"></circle>
+                        </svg></div>
+                    <p class="text-balance">he/him</p>
+                </div>
+            </div>
+            <!-- Horizontal Line-->
+            <div data-orientation="horizontal" role="none" data-slot="separator"
+                class="shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px">
+            </div>
+            <!--Experience Section-->
+            <section data-slot="panel" class="screen-line-before screen-line-after border-x border-edge"
+                id="experience">
+                <div data-slot="panel-header" class="screen-line-after px-4">
+                    <h2 data-slot="panel-title" class="text-3xl font-semibold">Experience</h2>
+                </div>
+                <div class="pr-2 pl-4">
+                    <div class="screen-line-after space-y-4 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex size-6 shrink-0 items-center justify-center select-none"><img
+                                    alt="Datamonk" aria-hidden="true" loading="lazy" width="24" height="24"
+                                    decoding="async" data-nimg="1" class="rounded-full" style="color:transparent"
+                                    src="https://cdn.srb.codes/images/companies/datamonk.svg"></div>
+                            <h3 class="text-lg leading-snug font-medium">Datamonk</h3>
+                        </div>
+                        <div
+                            class="relative space-y-4 before:absolute before:left-3 before:h-full before:w-px before:bg-border">
+                            <div class="relative last:before:absolute last:before:h-full last:before:w-4 last:before:bg-background"
+                                data-state="open"><button type="button" aria-controls="radix-_R_66cinpfknq6db_"
+                                    aria-expanded="true" data-state="open"
+                                    class="group/experience block w-full text-left select-none relative before:absolute before:-top-1 before:-right-1 before:-bottom-1.5 before:left-7 before:-z-1 before:rounded-lg hover:before:bg-accent/50">
+                                    <div class="relative z-1 mb-1 flex items-center gap-3">
+                                        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:inset-shadow-[1px_1px_1px,0px_0px_1px] dark:inset-shadow-white/15"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-code-xml size-4" aria-hidden="true">
+                                                <path d="m18 16 4-4-4-4"></path>
+                                                <path d="m6 8-4 4 4 4"></path>
+                                                <path d="m14.5 4-5 16"></path>
+                                            </svg></div>
+                                        <h4 class="flex-1 font-medium text-balance">Gen AI Engineer</h4>
+                                        <div class="shrink-0 text-muted-foreground [&amp;_svg]:size-4"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-down-up hidden group-data-[state=open]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 20 5-5 5 5"></path>
+                                                <path d="m7 4 5 5 5-5"></path>
+                                            </svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-up-down hidden group-data-[state=closed]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 15 5 5 5-5"></path>
+                                                <path d="m7 9 5-5 5 5"></path>
+                                            </svg></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-9 text-sm text-muted-foreground">
+                                        <dl>
+                                            <dt class="sr-only">Employment Type</dt>
+                                            <dd>Full-time</dd>
+                                        </dl>
+                                        <div data-orientation="vertical" role="none" data-slot="separator"
+                                            class="shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:h-4">
+                                        </div>
+                                        <dl>
+                                            <dt class="sr-only">Employment Period</dt>
+                                            <dd class="flex items-center gap-0.5"><span>06.2025</span><span
+                                                    class="font-mono">—</span><svg xmlns="http://www.w3.org/2000/svg"
+                                                    width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    class="lucide lucide-infinity size-4.5 translate-y-[0.5px]"
+                                                    aria-hidden="true">
+                                                    <path
+                                                        d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8">
+                                                    </path>
+                                                </svg><span class="sr-only">Present</span></dd>
+                                        </dl>
+                                    </div>
+                                </button>
+                                <div data-state="open" id="radix-_R_66cinpfknq6db_"
+                                    class="overflow-hidden duration-300 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                    style="transition-duration: 0s; animation-name: none; --radix-collapsible-content-height: 154px; --radix-collapsible-content-width: 742px;">
+                                    <div data-slot="prose"
+                                        class="prose prose-sm max-w-none font-mono text-foreground prose-zinc dark:prose-invert prose-headings:font-sans prose-headings:font-semibold prose-headings:text-balance prose-h2:border-b prose-h2:border-edge prose-h2:pb-2 prose-h2:text-2xl prose-lead:text-base prose-a:font-medium prose-a:break-words prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 prose-code:rounded-md prose-code:border prose-code:bg-muted/50 prose-code:px-[0.3rem] prose-code:py-[0.2rem] prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none prose-hr:border-edge pt-2 pl-9">
+                                        <ul>
+                                            <li>Develop and maintain core features of lms platform to enhance user
+                                                experience.</li>
+                                            <li>Ensure UI/UX consistency and adherence to standards.</li>
+                                            <li>Implement Finance chat bot using chainlit and python.</li>
+                                            <li>Analyze technical capabilities and provide optimal solutions.</li>
+                                        </ul>
+                                    </div>
+                                    <ul class="flex flex-wrap gap-1.5 pt-2 pl-9">
+                                        <li class="flex"><span
+                                                class="inline-flex items-center rounded-lg border bg-zinc-50 px-1.5 py-0.5 font-mono text-xs text-muted-foreground dark:bg-zinc-900">python</span>
+                                        </li>
+                                        <li class="flex"><span
+                                                class="inline-flex items-center rounded-lg border bg-zinc-50 px-1.5 py-0.5 font-mono text-xs text-muted-foreground dark:bg-zinc-900">chainlit</span>
+                                        </li>
+                                        <li class="flex"><span
+                                                class="inline-flex items-center rounded-lg border bg-zinc-50 px-1.5 py-0.5 font-mono text-xs text-muted-foreground dark:bg-zinc-900">Database</span>
+                                        </li>
+                                        <li class="flex"><span
+                                                class="inline-flex items-center rounded-lg border bg-zinc-50 px-1.5 py-0.5 font-mono text-xs text-muted-foreground dark:bg-zinc-900">Teamwork</span>
+                                        </li>
+                                        <li class="flex"><span
+                                                class="inline-flex items-center rounded-lg border bg-zinc-50 px-1.5 py-0.5 font-mono text-xs text-muted-foreground dark:bg-zinc-900">Research</span>
+                                        </li>
+                                        <li class="flex"><span
+                                                class="inline-flex items-center rounded-lg border bg-zinc-50 px-1.5 py-0.5 font-mono text-xs text-muted-foreground dark:bg-zinc-900">Problem-solving</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="screen-line-after space-y-4 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex size-6 shrink-0 items-center justify-center select-none"><img
+                                    alt="Vedhin technologies" aria-hidden="true" loading="lazy" width="24" height="24"
+                                    decoding="async" data-nimg="1" class="rounded-full" style="color:transparent"
+                                    src="https://cdn.srb.codes/images/companies/vedhin.png"></div>
+                            <h3 class="text-lg leading-snug font-medium">Vedhin technologies</h3>
+                        </div>
+                        <div
+                            class="relative space-y-4 before:absolute before:left-3 before:h-full before:w-px before:bg-border">
+                            <div class="relative last:before:absolute last:before:h-full last:before:w-4 last:before:bg-background"
+                                data-state="closed"><button type="button" aria-controls="radix-_R_6acinpfknq6db_"
+                                    aria-expanded="false" data-state="closed"
+                                    class="group/experience block w-full text-left select-none relative before:absolute before:-top-1 before:-right-1 before:-bottom-1.5 before:left-7 before:-z-1 before:rounded-lg hover:before:bg-accent/50">
+                                    <div class="relative z-1 mb-1 flex items-center gap-3">
+                                        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:inset-shadow-[1px_1px_1px,0px_0px_1px] dark:inset-shadow-white/15"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-code-xml size-4" aria-hidden="true">
+                                                <path d="m18 16 4-4-4-4"></path>
+                                                <path d="m6 8-4 4 4 4"></path>
+                                                <path d="m14.5 4-5 16"></path>
+                                            </svg></div>
+                                        <h4 class="flex-1 font-medium text-balance">Full Stack Engineer</h4>
+                                        <div class="shrink-0 text-muted-foreground [&amp;_svg]:size-4"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-down-up hidden group-data-[state=open]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 20 5-5 5 5"></path>
+                                                <path d="m7 4 5 5 5-5"></path>
+                                            </svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-up-down hidden group-data-[state=closed]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 15 5 5 5-5"></path>
+                                                <path d="m7 9 5-5 5 5"></path>
+                                            </svg></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-9 text-sm text-muted-foreground">
+                                        <dl>
+                                            <dt class="sr-only">Employment Type</dt>
+                                            <dd>Contractor</dd>
+                                        </dl>
+                                        <div data-orientation="vertical" role="none" data-slot="separator"
+                                            class="shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:h-4">
+                                        </div>
+                                        <dl>
+                                            <dt class="sr-only">Employment Period</dt>
+                                            <dd class="flex items-center gap-0.5"><span>11.2024</span><span
+                                                    class="font-mono">—</span><span>05.2025</span></dd>
+                                        </dl>
+                                    </div>
+                                </button>
+                                <div data-state="closed" id="radix-_R_6acinpfknq6db_" hidden=""
+                                    class="overflow-hidden duration-300 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                    style=""></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="screen-line-after space-y-4 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex size-6 shrink-0 items-center justify-center select-none"><span
+                                    class="flex size-2 rounded-full bg-zinc-300 dark:bg-zinc-600"></span></div>
+                            <h3 class="text-lg leading-snug font-medium">Freelance</h3>
+                        </div>
+                        <div
+                            class="relative space-y-4 before:absolute before:left-3 before:h-full before:w-px before:bg-border">
+                            <div class="relative last:before:absolute last:before:h-full last:before:w-4 last:before:bg-background"
+                                data-state="closed"><button type="button" aria-controls="radix-_R_6ecinpfknq6db_"
+                                    aria-expanded="false" data-state="closed"
+                                    class="group/experience block w-full text-left select-none relative before:absolute before:-top-1 before:-right-1 before:-bottom-1.5 before:left-7 before:-z-1 before:rounded-lg hover:before:bg-accent/50">
+                                    <div class="relative z-1 mb-1 flex items-center gap-3">
+                                        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:inset-shadow-[1px_1px_1px,0px_0px_1px] dark:inset-shadow-white/15"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-code-xml size-4" aria-hidden="true">
+                                                <path d="m18 16 4-4-4-4"></path>
+                                                <path d="m6 8-4 4 4 4"></path>
+                                                <path d="m14.5 4-5 16"></path>
+                                            </svg></div>
+                                        <h4 class="flex-1 font-medium text-balance">Full-stack Developer</h4>
+                                        <div class="shrink-0 text-muted-foreground [&amp;_svg]:size-4"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-down-up hidden group-data-[state=open]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 20 5-5 5 5"></path>
+                                                <path d="m7 4 5 5 5-5"></path>
+                                            </svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-up-down hidden group-data-[state=closed]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 15 5 5 5-5"></path>
+                                                <path d="m7 9 5-5 5 5"></path>
+                                            </svg></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-9 text-sm text-muted-foreground">
+                                        <dl>
+                                            <dt class="sr-only">Employment Type</dt>
+                                            <dd>Part-time</dd>
+                                        </dl>
+                                        <div data-orientation="vertical" role="none" data-slot="separator"
+                                            class="shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:h-4">
+                                        </div>
+                                        <dl>
+                                            <dt class="sr-only">Employment Period</dt>
+                                            <dd class="flex items-center gap-0.5"><span>2022</span><span
+                                                    class="font-mono">—</span><span>2025</span></dd>
+                                        </dl>
+                                    </div>
+                                </button>
+                                <div data-state="closed" id="radix-_R_6ecinpfknq6db_" hidden=""
+                                    class="overflow-hidden duration-300 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                    style=""></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="screen-line-after space-y-4 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex size-6 shrink-0 items-center justify-center select-none"><span
+                                    class="flex size-2 rounded-full bg-zinc-300 dark:bg-zinc-600"></span></div>
+                            <h3 class="text-lg leading-snug font-medium">Education</h3>
+                        </div>
+                        <div
+                            class="relative space-y-4 before:absolute before:left-3 before:h-full before:w-px before:bg-border">
+                            <div class="relative last:before:absolute last:before:h-full last:before:w-4 last:before:bg-background"
+                                data-state="closed"><button type="button" aria-controls="radix-_R_6icinpfknq6db_"
+                                    aria-expanded="false" data-state="closed"
+                                    class="group/experience block w-full text-left select-none relative before:absolute before:-top-1 before:-right-1 before:-bottom-1.5 before:left-7 before:-z-1 before:rounded-lg hover:before:bg-accent/50">
+                                    <div class="relative z-1 mb-1 flex items-center gap-3">
+                                        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:inset-shadow-[1px_1px_1px,0px_0px_1px] dark:inset-shadow-white/15"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-lightbulb size-4" aria-hidden="true">
+                                                <path
+                                                    d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5">
+                                                </path>
+                                                <path d="M9 18h6"></path>
+                                                <path d="M10 22h4"></path>
+                                            </svg></div>
+                                        <h4 class="flex-1 font-medium text-balance">GATE CSE 2025: Qualified</h4>
+                                        <div class="shrink-0 text-muted-foreground [&amp;_svg]:size-4"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-down-up hidden group-data-[state=open]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 20 5-5 5 5"></path>
+                                                <path d="m7 4 5 5 5-5"></path>
+                                            </svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-up-down hidden group-data-[state=closed]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 15 5 5 5-5"></path>
+                                                <path d="m7 9 5-5 5 5"></path>
+                                            </svg></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-9 text-sm text-muted-foreground">
+                                        <dl>
+                                            <dt class="sr-only">Employment Period</dt>
+                                            <dd class="flex items-center gap-0.5"><span>2025</span><span
+                                                    class="font-mono">—</span><svg xmlns="http://www.w3.org/2000/svg"
+                                                    width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    class="lucide lucide-infinity size-4.5 translate-y-[0.5px]"
+                                                    aria-hidden="true">
+                                                    <path
+                                                        d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8">
+                                                    </path>
+                                                </svg><span class="sr-only">Present</span></dd>
+                                        </dl>
+                                    </div>
+                                </button>
+                                <div data-state="closed" id="radix-_R_6icinpfknq6db_" hidden=""
+                                    class="overflow-hidden duration-300 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                    style=""></div>
+                            </div>
+                            <div class="relative last:before:absolute last:before:h-full last:before:w-4 last:before:bg-background"
+                                data-state="closed"><button type="button" aria-controls="radix-_R_aicinpfknq6db_"
+                                    aria-expanded="false" data-state="closed"
+                                    class="group/experience block w-full text-left select-none relative before:absolute before:-top-1 before:-right-1 before:-bottom-1.5 before:left-7 before:-z-1 before:rounded-lg hover:before:bg-accent/50">
+                                    <div class="relative z-1 mb-1 flex items-center gap-3">
+                                        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:inset-shadow-[1px_1px_1px,0px_0px_1px] dark:inset-shadow-white/15"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-graduation-cap size-4" aria-hidden="true">
+                                                <path
+                                                    d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z">
+                                                </path>
+                                                <path d="M22 10v6"></path>
+                                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                                            </svg></div>
+                                        <h4 class="flex-1 font-medium text-balance">Master of Computer Application (MCA)
+                                        </h4>
+                                        <div class="shrink-0 text-muted-foreground [&amp;_svg]:size-4"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-down-up hidden group-data-[state=open]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 20 5-5 5 5"></path>
+                                                <path d="m7 4 5 5 5-5"></path>
+                                            </svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-up-down hidden group-data-[state=closed]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 15 5 5 5-5"></path>
+                                                <path d="m7 9 5-5 5 5"></path>
+                                            </svg></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-9 text-sm text-muted-foreground">
+                                        <dl>
+                                            <dt class="sr-only">Employment Period</dt>
+                                            <dd class="flex items-center gap-0.5"><span>2023</span><span
+                                                    class="font-mono">—</span><span>2025</span></dd>
+                                        </dl>
+                                    </div>
+                                </button>
+                                <div data-state="closed" id="radix-_R_aicinpfknq6db_" hidden=""
+                                    class="overflow-hidden duration-300 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                    style=""></div>
+                            </div>
+                            <div class="relative last:before:absolute last:before:h-full last:before:w-4 last:before:bg-background"
+                                data-state="closed"><button type="button" aria-controls="radix-_R_eicinpfknq6db_"
+                                    aria-expanded="false" data-state="closed"
+                                    class="group/experience block w-full text-left select-none relative before:absolute before:-top-1 before:-right-1 before:-bottom-1.5 before:left-7 before:-z-1 before:rounded-lg hover:before:bg-accent/50">
+                                    <div class="relative z-1 mb-1 flex items-center gap-3">
+                                        <div class="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground dark:inset-shadow-[1px_1px_1px,0px_0px_1px] dark:inset-shadow-white/15"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-graduation-cap size-4" aria-hidden="true">
+                                                <path
+                                                    d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z">
+                                                </path>
+                                                <path d="M22 10v6"></path>
+                                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                                            </svg></div>
+                                        <h4 class="flex-1 font-medium text-balance">Bachelor of Computer Application
+                                            (BCA)</h4>
+                                        <div class="shrink-0 text-muted-foreground [&amp;_svg]:size-4"
+                                            aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-down-up hidden group-data-[state=open]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 20 5-5 5 5"></path>
+                                                <path d="m7 4 5 5 5-5"></path>
+                                            </svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-chevrons-up-down hidden group-data-[state=closed]/experience:block"
+                                                aria-hidden="true">
+                                                <path d="m7 15 5 5 5-5"></path>
+                                                <path d="m7 9 5-5 5 5"></path>
+                                            </svg></div>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-9 text-sm text-muted-foreground">
+                                        <dl>
+                                            <dt class="sr-only">Employment Period</dt>
+                                            <dd class="flex items-center gap-0.5"><span>2019</span><span
+                                                    class="font-mono">—</span><span>2022</span></dd>
+                                        </dl>
+                                    </div>
+                                </button>
+                                <div data-state="closed" id="radix-_R_eicinpfknq6db_" hidden=""
+                                    class="overflow-hidden duration-300 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                    style=""></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>
